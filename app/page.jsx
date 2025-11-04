@@ -7,7 +7,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { useEffect, useState } from "react"
-import {supabase} from './supabase-client'
+import { supabase } from './supabase-client'
 import { toast } from "sonner"
 
 const page = () => {
@@ -21,9 +21,9 @@ const page = () => {
   const [tasks, setTasks] = useState([])
 
   const fetchTasks = async () => {
-    const {error, data} = await supabase.from('tasks').select("*").order("created_at", {ascending: true})
+    const { error, data } = await supabase.from('tasks').select("*").order("created_at", { ascending: true })
 
-    if(error) {
+    if (error) {
       toast.error("Unable to fetch tasks")
       return
     }
@@ -34,21 +34,21 @@ const page = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    const {error} =await supabase.from('tasks').insert(newTask).single()
+    const { error } = await supabase.from('tasks').insert(newTask).single()
 
-    if(error) {
+    if (error) {
       toast.error("Unable to add task")
     }
 
     toast.success("Task added successfully")
 
-    setNewTask({title: "", description: ""})
+    setNewTask({ title: "", description: "" })
   }
 
   const deleteTask = async (id) => {
-    const {error} =await supabase.from('tasks').delete().eq("id", id)
+    const { error } = await supabase.from('tasks').delete().eq("id", id)
 
-    if(error) {
+    if (error) {
       toast.error("Unable to delete task")
     }
 
@@ -56,9 +56,9 @@ const page = () => {
   }
 
   const updateTask = async (id) => {
-    const {error} =await supabase.from('tasks').update({description: newDescription}).eq("id", id)
+    const { error } = await supabase.from('tasks').update({ description: newDescription }).eq("id", id)
 
-    if(error) {
+    if (error) {
       toast.error("Unable to update description")
     }
 
@@ -77,10 +77,10 @@ const page = () => {
       <div>
         <form onSubmit={handleSubmit} className="md:w-lg w-sm space-y-3">
           <Field>
-            <Input id="title" placeholder="Title" value={newTask.title} onChange={(e) => setNewTask((prev) => ({...prev, title: e.target.value}))} />
+            <Input id="title" placeholder="Title" value={newTask.title} onChange={(e) => setNewTask((prev) => ({ ...prev, title: e.target.value }))} />
           </Field>
           <Field>
-            <Textarea id="description" placeholder="Description" value={newTask.description} onChange={(e) => setNewTask((prev) => ({...prev, description: e.target.value}))} />
+            <Textarea id="description" placeholder="Description" value={newTask.description} onChange={(e) => setNewTask((prev) => ({ ...prev, description: e.target.value }))} />
           </Field>
           <Button className="w-full">Add Task</Button>
         </form>
@@ -89,21 +89,21 @@ const page = () => {
       {/* tasks */}
       <div className="space-y-5 pt-10">
         <div className="text-sm">Your Tasks</div>
-        {tasks.map((task,key) =>
+        {tasks.map((task, key) =>
           <div key={key} className="space-y-3 border border-black md:w-lg w-sm p-4">
-           <div className="space-y-1">
+            <div className="space-y-1">
               <div>{task.title}</div>
               <div className="text-neutral-500 text-sm">{task.description}</div>
-           </div>
-           <div>
-          <Field>
-            <Textarea placeholder="Updated description" onChange={(e) => setNewDescription(e.target.value)} />
-          </Field>
-           </div>
-           <div className="space-x-2">
-            <Button variant={'outline'} className="text-xs cursor-pointer" onClick={() => updateTask(task.id)}>Edit</Button>
-            <Button variant={'destructive'} className="text-xs cursor-pointer" onClick={() => deleteTask(task.id)}>Delete</Button>
-           </div>
+            </div>
+            <div>
+              <Field>
+                <Textarea placeholder="Updated description" onChange={(e) => setNewDescription(e.target.value)} />
+              </Field>
+            </div>
+            <div className="space-x-2">
+              <Button variant={'outline'} className="text-xs cursor-pointer" onClick={() => updateTask(task.id)}>Edit</Button>
+              <Button variant={'destructive'} className="text-xs cursor-pointer" onClick={() => deleteTask(task.id)}>Delete</Button>
+            </div>
           </div>
         )}
       </div>
