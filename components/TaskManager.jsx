@@ -10,7 +10,7 @@ import { useEffect, useState } from "react"
 import { supabase } from '@/components/supabase-client'
 import { toast } from "sonner"
 
-const TaskManager = () => {
+const TaskManager = ({session}) => {
   const [newTask, setNewTask] = useState({
     title: "",
     description: "",
@@ -34,7 +34,7 @@ const TaskManager = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    const { error } = await supabase.from('tasks').insert(newTask).single()
+    const { error } = await supabase.from('tasks').insert({ ...newTask, email: session.user.email }).single()
 
     if (error) {
       toast.error("Unable to add task")

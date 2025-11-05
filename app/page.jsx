@@ -27,7 +27,7 @@ const page = () => {
   return (
     <div>
       {session ? 
-        <TaskManager />
+        <TaskManager session={session} />
       : 
       <Auth />
       }
