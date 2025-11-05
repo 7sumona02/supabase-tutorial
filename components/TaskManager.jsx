@@ -34,13 +34,15 @@ const TaskManager = ({session}) => {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    const { error } = await supabase.from('tasks').insert({ ...newTask, email: session.user.email }).single()
+    const { error, data } = await supabase.from('tasks').insert({ ...newTask, email: session.user.email }).select().single()
 
     if (error) {
       toast.error("Unable to add task")
     }
 
     toast.success("Task added successfully")
+
+    // setTasks((prev) => [...prev, data])
 
     setNewTask({ title: "", description: "" })
   }
@@ -69,7 +71,30 @@ const TaskManager = ({session}) => {
     fetchTasks()
   }, [])
 
-  console.log(tasks)
+  useEffect(() => {
+  const channel = supabase
+    .channel('tasks-channel')
+    .on(
+      'postgres_changes',
+      { event: 'INSERT', schema: 'public', table: 'tasks' },
+      (payload) => {
+        const newTask = payload.new
+        setTasks((prev) => [...prev, newTask])
+      }
+    )
+
+  // subscribe returns a promise
+  channel.subscribe((status) => {
+    if (status === 'SUBSCRIBED') {
+      console.log('Subscribed!')
+    }
+  })
+
+  // cleanup on unmount
+  return () => {
+    supabase.removeChannel(channel)
+  }
+}, [])
 
   const logout = async () => {
      const {error} =await supabase.auth.signOut()
